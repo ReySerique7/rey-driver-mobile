@@ -325,13 +325,13 @@ export default function ControleUber() {
           <div className="h-3 rounded-full bg-zinc-800 overflow-hidden">
             <div className={`h-full ${oilColor} transition-all`} style={{ width: `${oilPct}%` }} />
           </div>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-300">
             {fmtKm(kmDesdeTroca)} km desde a última troca ·{" "}
             {oilAtraso > 0 ? (
-              <span className="text-rose-400 font-medium">{fmtKm(oilAtraso)} km em atraso</span>
+              <span className="text-rose-400 font-semibold">{fmtKm(oilAtraso)} km em atraso</span>
             ) : (
               <>
-                faltam <span className="text-zinc-200 font-medium">{fmtKm(oilRemaining)} km</span>
+                faltam <span className="text-white font-semibold">{fmtKm(oilRemaining)} km</span>
               </>
             )}
           </p>
