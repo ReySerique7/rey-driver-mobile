@@ -263,7 +263,7 @@ export default function ControleUber() {
       <div className="max-w-md mx-auto space-y-5 pb-10">
         <header className="flex items-center justify-center gap-2 pt-2">
           <Gauge className="text-amber-400" size={26} />
-          <h1 className="text-xl font-bold tracking-tight text-white">Rey Driver Mobile</h1>
+          <h1 className="text-xl font-bold tracking-tight text-red-500 underline decoration-amber-400 decoration-4 underline-offset-4">Rey Driver Mobile</h1>
         </header>
 
         <div className="bg-zinc-900 border-4 border-zinc-800 rounded-2xl p-4">
@@ -310,7 +310,7 @@ export default function ControleUber() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Droplet size={18} className="text-amber-400" />
-            <h2 className="font-semibold">Troca de óleo</h2>
+            <h2 className="font-semibold text-red-500">Troca de óleo</h2>
             {oilPct >= 95 && <AlertTriangle size={16} className="text-rose-400 ml-auto" />}
             <button
               onClick={() => {
@@ -376,7 +376,7 @@ export default function ControleUber() {
         </div>
 
         <div ref={formRef} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-3 scroll-mt-4">
-          <h2 className="font-semibold">{editingId ? "Editar dia" : "Novo dia"}</h2>
+          <h2 className="font-semibold text-red-500">{editingId ? "Editar dia" : "Novo dia"}</h2>
           <label className="text-xs text-zinc-500 block">
             Data
             <input
@@ -480,7 +480,7 @@ export default function ControleUber() {
         </div>
 
         <div className="space-y-3">
-          <h2 className="font-semibold px-1">Histórico por semana</h2>
+          <h2 className="font-semibold px-1 text-red-500">Histórico por semana</h2>
           {semanas.length === 0 && (
             <p className="text-zinc-500 text-sm px-1">Nenhum dia registrado ainda. Adicione o primeiro acima.</p>
           )}
