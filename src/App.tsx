@@ -60,9 +60,9 @@ const emptyForm = {
   kmInicial: "",
   kmFinal: "",
   rendaBruta: "",
-  abastecimento: "",
   horasTrabalhadas: "",
   numeroCorridas: "",
+  abastecimentoItems: [],
   despesasItems: [],
 };
 
@@ -86,6 +86,7 @@ export default function ControleUber() {
   const [openWeeks, setOpenWeeks] = useState({});
   const [novaDespesaCat, setNovaDespesaCat] = useState(CATEGORIAS[0]);
   const [novaDespesaValor, setNovaDespesaValor] = useState("");
+  const [novoAbastecimentoValor, setNovoAbastecimentoValor] = useState("");
   const [odometroInput, setOdometroInput] = useState("");
   const [editandoOdometro, setEditandoOdometro] = useState(false);
   const [trocaInput, setTrocaInput] = useState("");
@@ -104,7 +105,7 @@ export default function ControleUber() {
   const kmInicial = num(form.kmInicial);
   const kmFinal = num(form.kmFinal);
   const rendaBruta = num(form.rendaBruta);
-  const abastecimento = num(form.abastecimento);
+  const abastecimento = form.abastecimentoItems.reduce((a, it) => a + it, 0);
   const despesasTotal = form.despesasItems.reduce((a, it) => a + it.valor, 0);
   const kmRodados = kmFinal - kmInicial;
   const rendaLiquida = rendaBruta - abastecimento - despesasTotal;
@@ -144,6 +145,15 @@ export default function ControleUber() {
   const handleRemoveDespesa = (idx) => {
     setForm({ ...form, despesasItems: form.despesasItems.filter((_, i) => i !== idx) });
   };
+  const handleAddAbastecimento = () => {
+    const v = num(novoAbastecimentoValor);
+    if (!v) return;
+    setForm({ ...form, abastecimentoItems: [...form.abastecimentoItems, v] });
+    setNovoAbastecimentoValor("");
+  };
+  const handleRemoveAbastecimento = (idx) => {
+    setForm({ ...form, abastecimentoItems: form.abastecimentoItems.filter((_, i) => i !== idx) });
+  };
 
   const handleSave = () => {
     if (!form.kmInicial || !form.kmFinal || !form.rendaBruta) {
@@ -163,6 +173,7 @@ export default function ControleUber() {
       kmFinal,
       kmRodados,
       rendaBruta,
+      abastecimentoItems: form.abastecimentoItems,
       abastecimento,
       horasTrabalhadas,
       numeroCorridas,
@@ -188,7 +199,7 @@ export default function ControleUber() {
       kmInicial: String(d.kmInicial),
       kmFinal: String(d.kmFinal),
       rendaBruta: String(d.rendaBruta),
-      abastecimento: String(d.abastecimento),
+      abastecimentoItems: d.abastecimentoItems ?? [],
       horasTrabalhadas: String(d.horasTrabalhadas ?? ""),
       numeroCorridas: String(d.numeroCorridas ?? ""),
       despesasItems: d.despesasItems ?? [],
@@ -390,9 +401,41 @@ export default function ControleUber() {
             <Field label="Km inicial (auto)" value={form.kmInicial} onChange={(v) => setForm({ ...form, kmInicial: v })} />
             <Field label="Km final" value={form.kmFinal} onChange={(v) => setForm({ ...form, kmFinal: v })} />
             <Field label="Renda bruta (R$)" value={form.rendaBruta} onChange={(v) => setForm({ ...form, rendaBruta: v })} />
-            <Field label="Abastecido (R$)" value={form.abastecimento} onChange={(v) => setForm({ ...form, abastecimento: v })} />
             <Field label="Horas trabalhadas" value={form.horasTrabalhadas} onChange={(v) => setForm({ ...form, horasTrabalhadas: v })} />
             <Field label="Número de corridas" value={form.numeroCorridas} onChange={(v) => setForm({ ...form, numeroCorridas: v })} />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs text-zinc-500">Abastecido (R$)</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="Valor"
+                value={novoAbastecimentoValor}
+                onChange={(e) => setNovoAbastecimentoValor(e.target.value)}
+                className="flex-1 min-w-0 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                onClick={handleAddAbastecimento}
+                className="shrink-0 bg-zinc-700 hover:bg-zinc-600 transition rounded-lg px-4 flex items-center justify-center gap-1 text-sm"
+              >
+                <Plus size={16} />
+                Adicionar
+              </button>
+            </div>
+            {form.abastecimentoItems.length > 0 && (
+              <div className="space-y-1">
+                {form.abastecimentoItems.map((v, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-zinc-800/60 rounded-lg px-3 py-1.5 text-sm">
+                    <span className="text-zinc-300">Abastecimento {idx + 1} — {fmtMoney(v)}</span>
+                    <button onClick={() => handleRemoveAbastecimento(idx)} className="text-zinc-500 hover:text-rose-400">
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -444,6 +487,7 @@ export default function ControleUber() {
           {(form.kmInicial || form.kmFinal || form.rendaBruta) && (
             <div className="bg-zinc-800/60 rounded-lg p-3 text-sm space-y-1">
               <Row label="Km rodados no dia" value={`${fmtKm(kmRodados)} km`} />
+              <Row label="Total abastecido" value={fmtMoney(abastecimento)} />
               <Row label="Total despesas" value={fmtMoney(despesasTotal)} />
               {horasTrabalhadas > 0 && (
                 <>
@@ -557,6 +601,12 @@ export default function ControleUber() {
                               </button>
                             </div>
                           </div>
+                          {(d.abastecimentoItems ?? []).length > 1 && (
+                            <p className="text-xs text-zinc-500 mt-1">
+                              {d.abastecimentoItems.length} abastecimentos ·{" "}
+                              {d.abastecimentoItems.map((v) => fmtMoney(v)).join(" · ")}
+                            </p>
+                          )}
                           {(d.despesasItems ?? []).length > 0 && (
                             <p className="text-xs text-zinc-500 mt-1">
                               {d.despesasItems.map((it) => `${it.categoria} ${fmtMoney(it.valor)}`).join(" · ")}
